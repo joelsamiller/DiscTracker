@@ -5,7 +5,7 @@ from mayavi import mlab
 
 # Camera set up info
 d = 4  # Horizontal separation of the cameras in meters
-f = 0.004*1280/0.0047  # Focal length converted to pixels
+f = 0.004 * 1280 / 0.0047  # Focal length converted to pixels
 c = 1.8  # Distance between cameras and back of endzone in meters
 h = 2.8  # Height of cameras above ground in meters
 
@@ -15,10 +15,10 @@ tracks_directory = os.path.join(data_directory, "rosie_pull", "tracks")
 L = np.load(os.path.join(tracks_directory, "left.npz"))
 R = np.load(os.path.join(tracks_directory, "right.npz"))
 # Trim right channel to match left
-xl = L['x'] - 640
-xr = R['x'][3::] - 640
-zl = L['y'] - 360
-zr = R['y'][3::] - 360
+xl = L["x"] - 640
+xr = R["x"][3::] - 640
+zl = L["y"] - 360
+zr = R["y"][3::] - 360
 
 # Deproject
 X = 0.5 * d * (xl + xr) / (xr - xl)

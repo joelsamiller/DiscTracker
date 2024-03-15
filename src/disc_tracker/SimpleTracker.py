@@ -3,7 +3,8 @@ from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np
 
-class SimpleDistanceTracker():
+
+class SimpleDistanceTracker:
     def __init__(self, maxDisappeared=5000):
         self.nextID = 0
         self.objects = OrderedDict()
@@ -43,7 +44,7 @@ class SimpleDistanceTracker():
             usedRows = set()
             usedCols = set()
 
-            for (row, col) in zip(rows, cols):
+            for row, col in zip(rows, cols):
                 if row in usedRows or col in usedCols:
                     continue
 
@@ -53,7 +54,7 @@ class SimpleDistanceTracker():
 
                 usedRows.add(row)
                 usedCols.add(col)
-            
+
             unusedRows = set(range(0, r.shape[0])).difference(usedRows)
             unusedCols = set(range(0, r.shape[1])).difference(usedCols)
 
@@ -68,5 +69,3 @@ class SimpleDistanceTracker():
                 for col in unusedCols:
                     self.register(newPos[col])
         return self.objects
-                
-

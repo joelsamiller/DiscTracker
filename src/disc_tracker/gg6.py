@@ -5,14 +5,16 @@ import cv2 as cv
 from SimpleTracker import *
 import matplotlib.pyplot as plt
 
+
 def cleanMask(mask):
-    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5,5))
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
     mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel)
-    
-    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (25,25))
+
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (25, 25))
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel)
 
     return mask
+
 
 # Blob detector parameters
 params = cv.SimpleBlobDetector_Params()
@@ -24,7 +26,9 @@ params.filterByArea = False
 params.minArea = 10
 # Read in video from file
 data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
-video = cv.VideoCapture(os.path.join(data_directory, "rosie_pull", "video", "right.mp4"))
+video = cv.VideoCapture(
+    os.path.join(data_directory, "rosie_pull", "video", "right.mp4")
+)
 # Check video is open
 if not video.isOpened():
     print("Can't Open file")
@@ -38,20 +42,36 @@ while video.isOpened():
     ret, frame = video.read()  # Read next frame
     # Check if at end of file
     if not ret:
-        print('End of file')
+        print("End of file")
         break
     fgMask = fgbg.apply(frame)  # Create FG mask for frame
     fgMask = cleanMask(fgMask)  # Clean the mask to optimise object detection
     # cv.imshow('Frame', frame)
     blobs = blobDetector.detect(fgMask)  # Blob detection
-    tracks = tracker.update(cv.KeyPoint_convert(blobs))  # Update the tracker with the (x,y) coords of each blob in the frame
+    tracks = tracker.update(
+        cv.KeyPoint_convert(blobs)
+    )  # Update the tracker with the (x,y) coords of each blob in the frame
     # Plot blob locations and show IDs over the FG mask image
-    fgMask_with_blobs = cv.drawKeypoints(fgMask, blobs, np.array([]), (0,0,255), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    fgMask_with_blobs = cv.drawKeypoints(
+        fgMask,
+        blobs,
+        np.array([]),
+        (0, 0, 255),
+        cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
+    )
     for i in range(len(tracks.keys())):
         try:
             text = f"{list(tracks.keys())[i]}"  # IDs
-            loc = tracks[i][-1]  # Most recent location of the blob (current end of track)
-            cv.putText(frame, text, (int(loc[0]-10), int(loc[1]-10)), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0))
+            # Most recent location of the blob (current end of track)
+            loc = tracks[i][-1] 
+            cv.putText(
+                frame,
+                text,
+                (int(loc[0] - 10), int(loc[1] - 10)),
+                cv.FONT_HERSHEY_SIMPLEX,
+                1,
+                (255, 0, 0),
+            )
         except:
             pass
     # cv.imshow('FG Mask', fgMask_with_blobs)
@@ -60,12 +80,19 @@ while video.isOpened():
         discIndex = list(tracks.keys()).index(13)
         discTrack = tracks[discIndex]
         discTrack = [list(discTrack[i]) for i in range(len(discTrack))]
-        frame = cv.polylines(frame, [np.array(discTrack, np.int32).reshape(-1, 1, 2)], False, (255, 0, 0), 3, cv.LINE_AA)
-        cv.imshow('Frame', frame)
+        frame = cv.polylines(
+            frame,
+            [np.array(discTrack, np.int32).reshape(-1, 1, 2)],
+            False,
+            (255, 0, 0),
+            3,
+            cv.LINE_AA,
+        )
+        cv.imshow("Frame", frame)
     except:
-        cv.imshow('Frame', frame)
+        cv.imshow("Frame", frame)
     # out.write(frame)
-    if cv.waitKey(25) == ord('q'):
+    if cv.waitKey(25) == ord("q"):
         break
 # Clean up
 video.release()
@@ -76,10 +103,11 @@ cv.destroyAllWindows()
 discIndex = list(tracks.keys()).index(13)
 discTrack = tracks[discIndex]
 x, y = zip(*discTrack)
-y = [abs(oldy-720) for oldy in y]  # Invert y to convert from (0,0) top-left to bottom-left
+# Invert y to convert from (0,0) top-left to bottom-left
+y = [abs(oldy - 720) for oldy in y]
 plt.plot(x, y)
 # Set axis to have dimensions of the video frame
-plt.axis('image')
+plt.axis("image")
 plt.xlim(0, 1280)
 plt.ylim(0, 720)
 plt.show()
