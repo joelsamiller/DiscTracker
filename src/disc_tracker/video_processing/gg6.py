@@ -1,9 +1,11 @@
 import os
 
-import numpy as np
 import cv2 as cv
-from tracker import Tracker
 import matplotlib.pyplot as plt
+import numpy as np
+
+from disc_tracker.video_processing import Tracker
+from disc_tracker import DATA_DIRECTORY
 
 
 def cleanMask(mask):
@@ -26,15 +28,14 @@ params.filterByArea = False
 params.minArea = 10
 
 # Read in video from file
-data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 video_chanel = "left"
 video_resolution = {"x": 1280, "y": 720}
 video = cv.VideoCapture(
-    os.path.join(data_directory, "rosie_pull", "video", f"{video_chanel}.mp4")
+    os.path.join(DATA_DIRECTORY, "rosie_pull", "video", f"{video_chanel}.mp4")
 )
 # Check video is open
 if not video.isOpened():
-    print("Can't Open file")
+    exit("Can't Open file")
 
 background_subtractor = cv.createBackgroundSubtractorMOG2()  # Initialise BG subtractor
 tracker = Tracker()  # Initialise tracker
@@ -102,4 +103,4 @@ plt.ylim(0, video_resolution["y"])
 plt.show()
 
 # Save the track for the disc to file
-np.savez(os.path.join(data_directory, "rosie_pull", "tracks", f"{video_chanel}.npz"), x=x, y=y)
+np.savez(os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks", f"{video_chanel}.npz"), x=x, y=y)

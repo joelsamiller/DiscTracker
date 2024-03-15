@@ -1,6 +1,7 @@
+import numpy as np
+
 from scipy.spatial import distance
 from collections import OrderedDict
-import numpy as np
 
 
 class Tracker:

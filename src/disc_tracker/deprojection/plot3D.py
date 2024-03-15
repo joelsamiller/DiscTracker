@@ -3,6 +3,8 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+from disc_tracker import DATA_DIRECTORY
+
 
 def set_axes_equal(ax: plt.Axes):
     """Set 3D plot axes to equal scale.
@@ -99,8 +101,7 @@ c = 1.8  # Distance between cameras and back of endzone in meters
 h = 2.8  # Height of cameras above ground in meters
 
 # Load track data
-data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
-tracks_directory = os.path.join(data_directory, "rosie_pull", "tracks")
+tracks_directory = os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks")
 L = np.load(os.path.join(tracks_directory, "left.npz"))
 R = np.load(os.path.join(tracks_directory, "right.npz"))
 # Trim right channel to match left
