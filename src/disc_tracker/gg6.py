@@ -93,7 +93,7 @@ cv.destroyAllWindows()
 
 # Plot the 2D track for the disc
 # Invert y to convert from (0,0) top-left to bottom-left
-x, y = disc_track[:, 0], abs(disc_track[:, 1] - video_resolution["x"])
+x, y = disc_track[:, 0], abs(disc_track[:, 1] - video_resolution["y"])
 plt.plot(x, y)
 # Set axis to have dimensions of the video frame
 plt.axis("image")
