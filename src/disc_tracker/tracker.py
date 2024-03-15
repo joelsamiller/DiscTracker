@@ -1,17 +1,16 @@
-from re import S
 from scipy.spatial import distance as dist
 from collections import OrderedDict
 import numpy as np
 
 
-class SimpleDistanceTracker:
+class Tracker:
     def __init__(self, maxDisappeared=5000):
         self.nextID = 0
         self.objects = OrderedDict()
         self.disappeared = OrderedDict()
         self.maxDisappeared = maxDisappeared
 
-    def register(self, pos):
+    def register(self, pos: np.ndarray[float]):
         self.objects[self.nextID] = [pos]
         self.disappeared[self.nextID] = 0
         self.nextID += 1
@@ -20,7 +19,7 @@ class SimpleDistanceTracker:
         del self.objects[ID]
         del self.disappeared[ID]
 
-    def update(self, newPos):
+    def update(self, newPos: np.ndarray[float]):
         if len(newPos) == 0:
             for ID in list(self.disappeared.keys()):
                 self.disappeared[ID] += 1

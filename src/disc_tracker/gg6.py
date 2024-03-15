@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 import cv2 as cv
-from SimpleTracker import *
+from tracker import Tracker
 import matplotlib.pyplot as plt
 
 
@@ -24,19 +24,23 @@ params.filterByColor = True
 params.blobColor = 255
 params.filterByArea = False
 params.minArea = 10
+
 # Read in video from file
 data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+video_chanel = "left"
+video_resolution = {"x": 1280, "y": 720}
 video = cv.VideoCapture(
-    os.path.join(data_directory, "rosie_pull", "video", "right.mp4")
+    os.path.join(data_directory, "rosie_pull", "video", f"{video_chanel}.mp4")
 )
 # Check video is open
 if not video.isOpened():
     print("Can't Open file")
 
-# out = cv.VideoWriter('outpy.avi',cv.VideoWriter_fourcc('M','J','P','G'), 30, (1280,720))
-fgbg = cv.createBackgroundSubtractorMOG2()  # Initialise BG subtractor
-tracker = SimpleDistanceTracker()  # Initialise tracker
-blobDetector = cv.SimpleBlobDetector_create(params)  # Initialise blob detector
+background_subtractor = cv.createBackgroundSubtractorMOG2()  # Initialise BG subtractor
+tracker = Tracker()  # Initialise tracker
+blob_detector = cv.SimpleBlobDetector_create(params)  # Initialise blob detector
+
+disc_id = 19
 
 while video.isOpened():
     ret, frame = video.read()  # Read next frame
@@ -44,72 +48,58 @@ while video.isOpened():
     if not ret:
         print("End of file")
         break
-    fgMask = fgbg.apply(frame)  # Create FG mask for frame
-    fgMask = cleanMask(fgMask)  # Clean the mask to optimise object detection
-    # cv.imshow('Frame', frame)
-    blobs = blobDetector.detect(fgMask)  # Blob detection
-    tracks = tracker.update(
-        cv.KeyPoint_convert(blobs)
-    )  # Update the tracker with the (x,y) coords of each blob in the frame
-    # Plot blob locations and show IDs over the FG mask image
-    fgMask_with_blobs = cv.drawKeypoints(
-        fgMask,
-        blobs,
-        np.array([]),
-        (0, 0, 255),
-        cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
+    
+    # Object detection
+    foreground_mask = background_subtractor.apply(frame)  # Create FG mask for frame
+    foreground_mask = cleanMask(foreground_mask)  # Clean the mask to optimise object detection
+    blobs = blob_detector.detect(foreground_mask)  # Blob detection
+    # Update the tracker with the (x,y) coords of each blob in the frame
+    tracks = tracker.update(cv.KeyPoint_convert(blobs))
+    # Plot blob locations and show IDs over the video frame
+    frame = cv.drawKeypoints(
+        image=frame,
+        keypoints=blobs,
+        outImage=np.array([]),
+        color=(0, 0, 255),
+        flags=cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
     )
-    for i in range(len(tracks.keys())):
-        try:
-            text = f"{list(tracks.keys())[i]}"  # IDs
-            # Most recent location of the blob (current end of track)
-            loc = tracks[i][-1] 
-            cv.putText(
-                frame,
-                text,
-                (int(loc[0] - 10), int(loc[1] - 10)),
-                cv.FONT_HERSHEY_SIMPLEX,
-                1,
-                (255, 0, 0),
-            )
-        except:
-            pass
-    # cv.imshow('FG Mask', fgMask_with_blobs)
-    # Plot track history as line over the video frame
-    try:
-        discIndex = list(tracks.keys()).index(13)
-        discTrack = tracks[discIndex]
-        discTrack = [list(discTrack[i]) for i in range(len(discTrack))]
-        frame = cv.polylines(
-            frame,
-            [np.array(discTrack, np.int32).reshape(-1, 1, 2)],
-            False,
-            (255, 0, 0),
-            3,
-            cv.LINE_AA,
+    for id in tracks:
+        cv.putText(
+            img=frame,
+            text=f"{id}",
+            org=(tracks[id][-1] - 10).astype(int),  # bottom left of text
+            fontFace=cv.FONT_HERSHEY_SIMPLEX,
+            fontScale=1,
+            color=(255, 0, 0),
         )
-        cv.imshow("Frame", frame)
-    except:
-        cv.imshow("Frame", frame)
-    # out.write(frame)
+    # Plot track history as line over the video frame
+    if disc_id in tracks:
+        disc_track = np.array(tracks[disc_id]).astype(int)
+        frame = cv.polylines(
+            img=frame,
+            pts=[disc_track],
+            isClosed=False,
+            color=(255, 0, 0),
+            thickness=3,
+            lineType=cv.LINE_AA,
+        )
+
+    cv.imshow("Frame", frame)
     if cv.waitKey(25) == ord("q"):
         break
 # Clean up
 video.release()
-# out.release()
 cv.destroyAllWindows()
 
 # Plot the 2D track for the disc
-discIndex = list(tracks.keys()).index(13)
-discTrack = tracks[discIndex]
-x, y = zip(*discTrack)
 # Invert y to convert from (0,0) top-left to bottom-left
-y = [abs(oldy - 720) for oldy in y]
+x, y = disc_track[:, 0], abs(disc_track[:, 1] - video_resolution["x"])
 plt.plot(x, y)
 # Set axis to have dimensions of the video frame
 plt.axis("image")
-plt.xlim(0, 1280)
-plt.ylim(0, 720)
+plt.xlim(0, video_resolution["x"])
+plt.ylim(0, video_resolution["y"])
 plt.show()
+
 # Save the track for the disc to file
-np.savez(os.path.join(data_directory, "rosie_pull", "tracks", "right.npz"), x=x, y=y)
+np.savez(os.path.join(data_directory, "rosie_pull", "tracks", f"{video_chanel}.npz"), x=x, y=y)
