@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import plotly.graph_objects as go
 
@@ -8,8 +10,10 @@ c = 1.8  # Distance between cameras and back of endzone in meters
 h = 2.8  # Height of cameras above ground in meters
 
 # Load track data
-L = np.load('discPath_L.npz')
-R = np.load('discPath_R.npz')
+data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+tracks_directory = os.path.join(data_directory, "rosie_pull", "tracks")
+L = np.load(os.path.join(tracks_directory, "left.npz"))
+R = np.load(os.path.join(tracks_directory, "right.npz"))
 # Trim right channel to match left
 xl = L['x'] - 640
 xr = R['x'][3::] - 640

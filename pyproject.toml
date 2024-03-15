@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "disc_tracker"
+version = "0.0.1"
+authors = [
+  { name="Joel Miller", email="joelsamiller@gmail.com" },
+]
+description = "Rewrite of 4th year physics project. Uses 2 cameras to track the position of a disc in 3D"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+]

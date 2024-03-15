@@ -1,9 +1,7 @@
-from turtle import color
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import plotly.graph_objects as go
 
 def set_axes_equal(ax: plt.Axes):
     """Set 3D plot axes to equal scale.
@@ -78,8 +76,10 @@ c = 1.8  # Distance between cameras and back of endzone in meters
 h = 2.8  # Height of cameras above ground in meters
 
 # Load track data
-L = np.load('discPath_L.npz')
-R = np.load('discPath_R.npz')
+data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+tracks_directory = os.path.join(data_directory, "rosie_pull", "tracks")
+L = np.load(os.path.join(tracks_directory, "left.npz"))
+R = np.load(os.path.join(tracks_directory, "right.npz"))
 # Trim right channel to match left
 xl = L['x'] - 640
 xr = R['x'][3::] - 640

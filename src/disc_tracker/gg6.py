@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import cv2 as cv
 from SimpleTracker import *
@@ -21,7 +23,8 @@ params.blobColor = 255
 params.filterByArea = False
 params.minArea = 10
 # Read in video from file
-video = cv.VideoCapture('.\DiscTracker\Video\RosiePull L.mp4')
+data_directory = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+video = cv.VideoCapture(os.path.join(data_directory, "rosie_pull", "video", "right.mp4"))
 # Check video is open
 if not video.isOpened():
     print("Can't Open file")
@@ -54,7 +57,7 @@ while video.isOpened():
     # cv.imshow('FG Mask', fgMask_with_blobs)
     # Plot track history as line over the video frame
     try:
-        discIndex = list(tracks.keys()).index(19)
+        discIndex = list(tracks.keys()).index(13)
         discTrack = tracks[discIndex]
         discTrack = [list(discTrack[i]) for i in range(len(discTrack))]
         frame = cv.polylines(frame, [np.array(discTrack, np.int32).reshape(-1, 1, 2)], False, (255, 0, 0), 3, cv.LINE_AA)
@@ -70,7 +73,7 @@ video.release()
 cv.destroyAllWindows()
 
 # Plot the 2D track for the disc
-discIndex = list(tracks.keys()).index(19)
+discIndex = list(tracks.keys()).index(13)
 discTrack = tracks[discIndex]
 x, y = zip(*discTrack)
 y = [abs(oldy-720) for oldy in y]  # Invert y to convert from (0,0) top-left to bottom-left
@@ -81,4 +84,4 @@ plt.xlim(0, 1280)
 plt.ylim(0, 720)
 plt.show()
 # Save the track for the disc to file
-np.savez('discPath_L.npz', x=x, y=y)
+np.savez(os.path.join(data_directory, "rosie_pull", "tracks", "right.npz"), x=x, y=y)
