@@ -115,48 +115,47 @@ X = 0.5 * d * (xl + xr) / (xr - xl)
 Z = -(0.5 * d * (zl + zr) / (xr - xl)) + h
 Y = d * f / (xr - xl) - c
 
-fig = plt.figure()
-ax = plt.axes(projection="3d")
+def main() -> None:
+    ax = plt.axes(projection="3d")
 
-ax.plot3D(-X, -Y, Z, zorder=10)
-# # Pitch verts
-px = [-7.6, 7.6, 7.6, -7.6]
-py = [30.4, 30.4, 0, 0]
-pz = [0, 0, 0, 0]
-pitch = [list(zip(px, py, pz))]
-pxx, pyy = np.meshgrid(px, py)
-pzz = np.zeros_like(pxx)
-# ax.add_collection3d(Poly3DCollection(pitch, color=(0, 1, 0), edgecolor='k', zorder=0))
-ax.plot_surface(pxx, pyy, pzz, color=(0, 1, 0), edgecolor="k", zorder=-1)
-# EZ verts
-ezx = [-7.6, 7.6, 7.6, -7.6, -7.6, 7.6, 7.6, -7.6]
-ez1y = [30.4, 30.4, 27.4, 27.4, 30.4, 30.4, 27.4, 27.4]
-ez2y = [3, 3, 0, 0, 3, 3, 0, 0]
-ezz = [0, 0, 0, 0, 2, 2, 2, 2]
-ezx, ezy, ezz = cuboid_data((0, 1.5, 1), (15.2, 3, 2))
-ax.plot_wireframe(
-    np.array(ezx),
-    np.array(ezy),
-    np.array(ezz),
-    facecolor=(0, 0, 0, 0),
-    rstride=1,
-    cstride=1,
-    edgecolor="r",
-    zorder=9,
-)
-ezx, ezy, ezz = cuboid_data((0, 28.9, 1), (15.2, 3, 2))
-ax.plot_wireframe(
-    np.array(ezx),
-    np.array(ezy),
-    np.array(ezz),
-    facecolor=(0, 0, 0, 0),
-    rstride=1,
-    cstride=1,
-    edgecolor="r",
-    zorder=9,
-)
+    ax.plot3D(-X, -Y, Z, zorder=10)
+    # # Pitch verts
+    px = [-7.6, 7.6, 7.6, -7.6]
+    py = [30.4, 30.4, 0, 0]
+    pz = [0, 0, 0, 0]
+    pxx, pyy = np.meshgrid(px, py)
+    pzz = np.zeros_like(pxx)
+    ax.plot_surface(pxx, pyy, pzz, color=(0, 1, 0), edgecolor="k", zorder=-1)
+    # EZ verts
+    ezx = [-7.6, 7.6, 7.6, -7.6, -7.6, 7.6, 7.6, -7.6]
+    ezz = [0, 0, 0, 0, 2, 2, 2, 2]
+    ezx, ezy, ezz = cuboid_data((0, 1.5, 1), (15.2, 3, 2))
+    ax.plot_wireframe(
+        np.array(ezx),
+        np.array(ezy),
+        np.array(ezz),
+        facecolor=(0, 0, 0, 0),
+        rstride=1,
+        cstride=1,
+        edgecolor="r",
+        zorder=9,
+    )
+    ezx, ezy, ezz = cuboid_data((0, 28.9, 1), (15.2, 3, 2))
+    ax.plot_wireframe(
+        np.array(ezx),
+        np.array(ezy),
+        np.array(ezz),
+        facecolor=(0, 0, 0, 0),
+        rstride=1,
+        cstride=1,
+        edgecolor="r",
+        zorder=9,
+    )
 
 
-ax.set_box_aspect([1, 1, 1])
-set_axes_equal(ax)
-plt.show()
+    ax.set_box_aspect([1, 1, 1])
+    set_axes_equal(ax)
+    plt.show()
+
+if __name__ == "__main__":
+    main()
