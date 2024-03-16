@@ -41,7 +41,7 @@ background_subtractor = cv.createBackgroundSubtractorMOG2()  # Initialise BG sub
 tracker = Tracker()  # Initialise tracker
 blob_detector = cv.SimpleBlobDetector_create(params)  # Initialise blob detector
 
-disc_id = 19
+disc_id = 13
 
 def main() -> None:
     while video.isOpened():

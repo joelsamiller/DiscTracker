@@ -1,3 +1,4 @@
+from turtle import pos
 import numpy as np
 
 from scipy.spatial import distance
@@ -13,7 +14,7 @@ class Tracker:
         self.max_disappeared = max_disappeared
 
     def register(self, position: np.ndarray[float]):
-        self.objects[self.next_id] = [position]
+        self.objects[self.next_id] = position[None, :]  # Ensure array is 2D
         self.disappeared[self.next_id] = 0
         self.next_id += 1
 
@@ -36,13 +37,13 @@ class Tracker:
                 self.register(p)
         else:
             ids = np.array([*self.objects])
-            old_position = np.array([p[-1] for p in self.objects.values()])
+            old_position = np.vstack([p[-1] for p in self.objects.values()])
             # Jonker-Volgenant assignment using distance from last position as cost matrix
             row, col = optimize.linear_sum_assignment(distance.cdist(old_position, new_position))
 
             for r, c in zip(row, col):
                 id = ids[r]
-                self.objects[id].append(new_position[c])
+                self.objects[id] = np.vstack([self.objects[id], new_position[c]])
                 self.disappeared[id] = 0
 
             ids = np.delete(ids, row)
