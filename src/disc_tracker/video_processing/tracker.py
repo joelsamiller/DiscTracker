@@ -1,27 +1,28 @@
 import numpy as np
 
 from scipy.spatial import distance
+from scipy import optimize
 from collections import OrderedDict
 
 
 class Tracker:
     def __init__(self, max_disappeared=5000):
-        self.nextID = 0
+        self.next_id = 0
         self.objects = OrderedDict()
         self.disappeared = OrderedDict()
         self.max_disappeared = max_disappeared
 
     def register(self, position: np.ndarray[float]):
-        self.objects[self.nextID] = [position]
-        self.disappeared[self.nextID] = 0
-        self.nextID += 1
+        self.objects[self.next_id] = [position]
+        self.disappeared[self.next_id] = 0
+        self.next_id += 1
 
-    def deregister(self, ID):
-        del self.objects[ID]
-        del self.disappeared[ID]
+    def deregister(self, id):
+        del self.objects[id]
+        del self.disappeared[id]
 
     def update(self, new_position: np.ndarray[float]):
-        if len(new_position) == 0:
+        if new_position.size == 0:
             for id in self.disappeared:
                 self.disappeared[id] += 1
 
@@ -34,40 +35,26 @@ class Tracker:
             for p in new_position:
                 self.register(p)
         else:
-            ids = [*self.objects]
+            ids = np.array([*self.objects])
             old_position = np.array([p[-1] for p in self.objects.values()])
+            # Jonker-Volgenant assignment using distance from last position as cost matrix
+            row, col = optimize.linear_sum_assignment(distance.cdist(old_position, new_position))
 
-            r = distance.cdist(old_position, new_position)
-
-            rows = r.min(axis=1).argsort()
-            cols = r.argmin(axis=1)[rows]
-
-            used_rows = set()
-            used_cols = set()
-
-            for row, col in zip(rows, cols):
-                if row in used_rows or col in used_cols:
-                    continue
-
-                id = ids[row]
-                self.objects[id].append(new_position[col])
+            for r, c in zip(row, col):
+                id = ids[r]
+                self.objects[id].append(new_position[c])
                 self.disappeared[id] = 0
 
-                used_rows.add(row)
-                used_cols.add(col)
-
-            unused_rows = set(range(0, r.shape[0])).difference(used_rows)
-            unused_cols = set(range(0, r.shape[1])).difference(used_cols)
-
-            if r.shape[0] >= r.shape[1]:
-                for row in unused_rows:
-                    id = ids[row]
+            ids = np.delete(ids, row)
+            if ids.size > 0:
+                for id in ids:
                     self.disappeared[id] += 1
-
                     if self.disappeared[id] > self.max_disappeared:
                         self.deregister(id)
             else:
-                for col in unused_cols:
-                    self.register(new_position[col])
+                unassigned_positions = np.delete(new_position, col, axis=0)
+                for position in unassigned_positions:
+                    self.register(position)
+            
 
         return self.objects
