@@ -5,6 +5,18 @@ from scipy import optimize
 from collections import OrderedDict
 
 
+class Object:
+    def __init__(self, creation_time: int, position: np.ndarray[float]) -> None:
+        self.position = np.append(position, creation_time)
+
+        self.track = self.position[None, :]
+        self.velocity = np.array([0, 0])
+
+    def update_position(self, time: int, position: np.ndarray[float]) -> None:
+        self.position = np.append(position, time)
+        self.track = np.vstack([self.track, self.position])
+
+
 class Tracker:
     def __init__(self, max_disappeared=5000):
         self.next_id = 0
@@ -14,10 +26,9 @@ class Tracker:
         self.max_disappeared = max_disappeared
 
     def register(self, position: np.ndarray[float]):
-        self.objects[self.next_id] = {
-            "position": position[None, :],
-            "time": self.current_time,
-        }  # Ensure array is 2D
+        self.objects[self.next_id] = Object(
+            creation_time=self.current_time, position=position
+        )
         self.disappeared[self.next_id] = 0
         self.next_id += 1
 
@@ -40,19 +51,16 @@ class Tracker:
                 self.register(p)
         else:
             ids = np.array([*self.objects])
-            old_position = np.vstack([p["position"][-1] for p in self.objects.values()])
-            # Jonker-Volgenant assignment using distance from last position as cost matrix
+            old_position = np.vstack([o.position[0:2] for o in self.objects.values()])
+            # Jonker-Volgenant assignment using distance from old position as cost matrix
             row, col = optimize.linear_sum_assignment(
                 distance.cdist(old_position, new_position)
             )
 
             for r, c in zip(row, col):
                 id = ids[r]
-                self.objects[id]["position"] = np.vstack(
-                    [self.objects[id]["position"], new_position[c]]
-                )
-                self.objects[id]["time"] = np.append(
-                    self.objects[id]["time"], self.current_time
+                self.objects[id].update_position(
+                    time=self.current_time, position=new_position[c]
                 )
                 self.disappeared[id] = 0
 

@@ -71,19 +71,18 @@ def main() -> None:
             cv.putText(
                 img=frame,
                 text=f"{id}",
-                org=(tracks[id]["position"][-1] - 10).astype(
-                    int
-                ),  # bottom left of text
+                # bottom left of text
+                org=(tracks[id].position[0:2] - 10).astype(int),
                 fontFace=cv.FONT_HERSHEY_SIMPLEX,
                 fontScale=1,
                 color=(255, 0, 0),
             )
         # Plot track history as line over the video frame
         if disc_id in tracks:
-            disc_track = np.array(tracks[disc_id]["position"]).astype(int)
+            disc_track = tracks[disc_id].track.astype(int)
             frame = cv.polylines(
                 img=frame,
-                pts=[disc_track],
+                pts=[np.array(disc_track[:, 0:2])],
                 isClosed=False,
                 color=(255, 0, 0),
                 thickness=3,
@@ -112,7 +111,7 @@ def main() -> None:
         os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks", f"{video_chanel}.npz"),
         x=x,
         y=y,
-        t=tracks[disc_id]["time"],
+        t=disc_track[:, 2],
     )
 
 
