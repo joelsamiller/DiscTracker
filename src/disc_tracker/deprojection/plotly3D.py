@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import plotly.graph_objects as go
+from numpy.lib.npyio import NpzFile
 
 from disc_tracker import DATA_DIRECTORY
 
@@ -10,21 +11,39 @@ d = 4  # Horizontal separation of the cameras in meters
 f = 0.004 * 1280 / 0.0047  # Focal length converted to pixels
 c = 1.8  # Distance between cameras and back of endzone in meters
 h = 2.8  # Height of cameras above ground in meters
+video_resolution = {"x": 1280, "y": 720}
+
+
+def get_time_index(left: np.ndarray[int], right: np.ndarray[int]) -> np.ndarray[int]:
+    t_min = max(min(left), min(right))
+    t_max = min(max(left), max(right))
+    return np.arange(t_min, t_max + 1)
+
+
+def complete_track(data: NpzFile, time_index: np.ndarray[int]) -> dict:
+    return {
+        axis: np.interp(time_index, data["t"], data[axis]).astype(int) for axis in "xy"
+    }
+
 
 # Load track data
 tracks_directory = os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks")
 L = np.load(os.path.join(tracks_directory, "left.npz"))
 R = np.load(os.path.join(tracks_directory, "right.npz"))
-# Trim right channel to match left
-xl = L["x"] - 640
-xr = R["x"][3::] - 640
-zl = L["y"] - 360
-zr = R["y"][3::] - 360
+
+time_index = get_time_index(L["t"], R["t"])
+right = complete_track(R, time_index)
+left = complete_track(L, time_index)
+
+# Centre coordinates on 0
+for track in [left, right]:
+    for axis in "xy":
+        track[axis] -= int(video_resolution[axis] / 2)
 
 # Deproject
-X = 0.5 * d * (xl + xr) / (xr - xl)
-Z = -(0.5 * d * (zl + zr) / (xr - xl)) + h
-Y = d * f / (xr - xl) - c
+X = 0.5 * d * (left["x"] + right["x"]) / (right["x"] - left["x"])
+Z = -(0.5 * d * (left["y"] + right["y"]) / (right["x"] - left["x"])) + h
+Y = d * f / (right["x"] - left["x"]) - c
 
 # Verticies of pitch
 px = [-7.6, 7.6, 7.6, -7.6]
@@ -39,6 +58,7 @@ ezz = [0, 0, 0, 0, 2, 2, 2, 2]
 EZx = [-7.6, 7.6, 7.6, -7.6, -7.6]
 EZ1y = [30.4, 30.4, 27.4, 27.4, 30.4]
 EZ2y = [3, 3, 0, 0, 3]
+
 
 def main() -> None:
     # Create figure plotting the disc path
@@ -115,6 +135,7 @@ def main() -> None:
     # Save plot to file
     fig.write_html("DiscTrack.html")
     fig.show()
+
 
 if __name__ == "__main__":
     main()

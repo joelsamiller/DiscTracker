@@ -28,7 +28,7 @@ params.filterByArea = False
 params.minArea = 10
 
 # Read in video from file
-video_chanel = "left"
+video_chanel = "right"
 video_resolution = {"x": 1280, "y": 720}
 video = cv.VideoCapture(
     os.path.join(DATA_DIRECTORY, "rosie_pull", "video", f"{video_chanel}.mp4")
@@ -41,7 +41,8 @@ background_subtractor = cv.createBackgroundSubtractorMOG2()  # Initialise BG sub
 tracker = Tracker()  # Initialise tracker
 blob_detector = cv.SimpleBlobDetector_create(params)  # Initialise blob detector
 
-disc_id = 13
+disc_id = 2
+
 
 def main() -> None:
     while video.isOpened():
@@ -50,10 +51,11 @@ def main() -> None:
         if not ret:
             print("End of file")
             break
-        
+
         # Object detection
         foreground_mask = background_subtractor.apply(frame)  # Create FG mask for frame
-        foreground_mask = cleanMask(foreground_mask)  # Clean the mask to optimise object detection
+        # Clean the mask to optimise object detection
+        foreground_mask = cleanMask(foreground_mask)
         blobs = blob_detector.detect(foreground_mask)  # Blob detection
         # Update the tracker with the (x,y) coords of each blob in the frame
         tracks = tracker.update(cv.KeyPoint_convert(blobs))
@@ -69,14 +71,16 @@ def main() -> None:
             cv.putText(
                 img=frame,
                 text=f"{id}",
-                org=(tracks[id][-1] - 10).astype(int),  # bottom left of text
+                org=(tracks[id]["position"][-1] - 10).astype(
+                    int
+                ),  # bottom left of text
                 fontFace=cv.FONT_HERSHEY_SIMPLEX,
                 fontScale=1,
                 color=(255, 0, 0),
             )
         # Plot track history as line over the video frame
         if disc_id in tracks:
-            disc_track = np.array(tracks[disc_id]).astype(int)
+            disc_track = np.array(tracks[disc_id]["position"]).astype(int)
             frame = cv.polylines(
                 img=frame,
                 pts=[disc_track],
@@ -104,7 +108,13 @@ def main() -> None:
     plt.show()
 
     # Save the track for the disc to file
-    np.savez(os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks", f"{video_chanel}.npz"), x=x, y=y)
+    np.savez(
+        os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks", f"{video_chanel}.npz"),
+        x=x,
+        y=y,
+        t=tracks[disc_id]["time"],
+    )
+
 
 if __name__ == "__main__":
     main()
