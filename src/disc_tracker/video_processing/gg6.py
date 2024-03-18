@@ -24,11 +24,11 @@ params.filterByInertia = False
 params.filterByConvexity = False
 params.filterByColor = True
 params.blobColor = 255
-params.filterByArea = False
-params.minArea = 10
+params.filterByArea = True
+params.minArea = 16
 
 # Read in video from file
-video_chanel = "right"
+video_chanel = "left"
 video_resolution = {"x": 1280, "y": 720}
 video = cv.VideoCapture(
     os.path.join(DATA_DIRECTORY, "rosie_pull", "video", f"{video_chanel}.mp4")
@@ -41,7 +41,7 @@ background_subtractor = cv.createBackgroundSubtractorMOG2()  # Initialise BG sub
 tracker = Tracker()  # Initialise tracker
 blob_detector = cv.SimpleBlobDetector_create(params)  # Initialise blob detector
 
-disc_id = 2
+disc_id = 10
 
 
 def main() -> None:
@@ -57,6 +57,8 @@ def main() -> None:
         # Clean the mask to optimise object detection
         foreground_mask = cleanMask(foreground_mask)
         blobs = blob_detector.detect(foreground_mask)  # Blob detection
+        if blobs == ():
+            continue
         # Update the tracker with the (x,y) coords of each blob in the frame
         tracks = tracker.update(cv.KeyPoint_convert(blobs))
         # Plot blob locations and show IDs over the video frame
