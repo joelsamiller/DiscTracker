@@ -1,10 +1,7 @@
-import os
-
 import numpy as np
 import matplotlib.pyplot as plt
 
-from disc_tracker import DATA_DIRECTORY
-
+from disc_tracker.deprojection.disc_track import DiscTrack
 
 def set_axes_equal(ax: plt.Axes):
     """Set 3D plot axes to equal scale.
@@ -24,13 +21,11 @@ def set_axes_equal(ax: plt.Axes):
     radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
     _set_axes_radius(ax, origin, radius)
 
-
 def _set_axes_radius(ax, origin, radius):
     x, y, z = origin
     ax.set_xlim3d([x - radius, x + radius])
     ax.set_ylim3d([y - radius, y + radius])
     ax.set_zlim3d([z - radius, z + radius])
-
 
 def cuboid_data(center, size):
     """
@@ -93,42 +88,16 @@ def cuboid_data(center, size):
     ]  # z coordinate of points in inside surface
     return x, y, z
 
-
-# Camera set up info
-d = 4  # Horizontal separation of the cameras in meters
-f = 0.004 * 1280 / 0.0047  # Focal length converted to pixels
-c = 1.8  # Distance between cameras and back of endzone in meters
-h = 2.8  # Height of cameras above ground in meters
-
-# Load track data
-tracks_directory = os.path.join(DATA_DIRECTORY, "rosie_pull", "tracks")
-L = np.load(os.path.join(tracks_directory, "left.npz"))
-R = np.load(os.path.join(tracks_directory, "right.npz"))
-# Trim right channel to match left
-xl = L["x"] - 640
-xr = R["x"][3::] - 640
-zl = L["y"] - 360
-zr = R["y"][3::] - 360
-
-# Deproject
-X = 0.5 * d * (xl + xr) / (xr - xl)
-Z = -(0.5 * d * (zl + zr) / (xr - xl)) + h
-Y = d * f / (xr - xl) - c
-
-def main() -> None:
-    ax = plt.axes(projection="3d")
-
-    ax.plot3D(-X, -Y, Z, zorder=10)
-    # # Pitch verts
-    px = [-7.6, 7.6, 7.6, -7.6]
-    py = [30.4, 30.4, 0, 0]
-    pz = [0, 0, 0, 0]
+def draw_pitch(ax, width = 15.2, length = 30.4, endzone_depth=2) -> None:
+    # Pitch verts
+    px = [-width / 2, width / 2, width / 2, -width / 2]
+    py = [length] * 2 + [0] * 2
     pxx, pyy = np.meshgrid(px, py)
     pzz = np.zeros_like(pxx)
     ax.plot_surface(pxx, pyy, pzz, color=(0, 1, 0), edgecolor="k", zorder=-1)
-    # EZ verts
-    ezx = [-7.6, 7.6, 7.6, -7.6, -7.6, 7.6, 7.6, -7.6]
-    ezz = [0, 0, 0, 0, 2, 2, 2, 2]
+    # Endzone verts
+    ezx = [-width / 2, width / 2, width / 2, -width / 2] * 2
+    ezz = [0] * 4 + [endzone_depth] * 4
     ezx, ezy, ezz = cuboid_data((0, 1.5, 1), (15.2, 3, 2))
     ax.plot_wireframe(
         np.array(ezx),
@@ -152,7 +121,11 @@ def main() -> None:
         zorder=9,
     )
 
-
+def main() -> None:
+    disc_path = DiscTrack("rosie_pull").deproject()
+    ax = plt.axes(projection="3d")
+    draw_pitch(ax)
+    ax.plot3D(-disc_path[0], -disc_path[1], disc_path[2], zorder=10)
     ax.set_box_aspect([1, 1, 1])
     set_axes_equal(ax)
     plt.show()
