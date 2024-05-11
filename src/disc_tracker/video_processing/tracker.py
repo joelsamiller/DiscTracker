@@ -36,7 +36,7 @@ class Tracker:
         del self.objects[id]
         del self.disappeared[id]
 
-    def update(self, new_position: np.ndarray[float]):
+    def update(self, new_position: np.ndarray[float]) -> OrderedDict:
         if new_position.size == 0:
             for id in self.disappeared:
                 self.disappeared[id] += 1
