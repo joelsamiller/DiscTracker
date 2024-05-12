@@ -14,3 +14,12 @@ requires-python = ">=3.12"
 classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
+dependencies = [
+  "numpy",
+  "pyyaml",
+  "scipy",
+  "opencv-python",
+  "plotly",
+  "matplotlib",
+  "mayavi",
+]

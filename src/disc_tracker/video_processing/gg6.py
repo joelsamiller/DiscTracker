@@ -8,7 +8,7 @@ from disc_tracker.video_processing import Tracker
 
 
 def cleanMask(mask: np.ndarray) -> np.ndarray:
-    
+
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
     mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel)
 
@@ -83,7 +83,7 @@ def add_object_bbox_to_frame(frame: cv.typing.MatLike, blobs) -> cv.typing.MatLi
 
 
 def track_objects(video: cv.VideoCapture, chanel: str) -> OrderedDict:
-    
+
     background_subtractor = (
         cv.createBackgroundSubtractorMOG2()
     )  # Initialise BG subtractor

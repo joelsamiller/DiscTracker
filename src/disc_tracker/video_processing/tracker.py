@@ -1,8 +1,8 @@
 import numpy as np
 
+from collections import OrderedDict
 from scipy.spatial import distance
 from scipy import optimize
-from collections import OrderedDict
 
 
 class Object:

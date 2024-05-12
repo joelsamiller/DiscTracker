@@ -6,26 +6,32 @@ import plotly.graph_objects as go
 from disc_tracker.deprojection.disc_track import DiscTrack
 
 
-def draw_pitch(fig, width = 15.2, length = 30.4) -> None:
+def draw_pitch(fig, width=15.2, length=30.4) -> None:
     # Pitch verts
     px = [-width / 2, width / 2, width / 2, -width / 2]
     py = [length] * 2 + [0] * 2
     # Add pitch mesh
     fig.add_trace(go.Mesh3d(x=px, y=py, z=[0] * 4, color="limegreen", opacity=0.70))
 
-def draw_endzones(fig, width = 15.2, length = 30.4, endzone_depth=3) -> None:
+
+def draw_endzones(fig, width=15.2, length=30.4, endzone_depth=3) -> None:
     # Endzone verts
     ezx = [-width / 2, width / 2, width / 2, -width / 2]
     ezy1 = [length] * 2 + [length - endzone_depth] * 2
     ezy2 = [endzone_depth] * 2 + [0] * 2
-    
+
     # Add upper and lower end zone box outlines
     for y, z in zip(
-        ([ezy1 + [ezy1[0]]]) * 2 + ([ezy2 + [ezy2[0]]]) * 2,
-        ([[0] * 5] + [[2] * 5]) * 2
+        ([ezy1 + [ezy1[0]]]) * 2 + ([ezy2 + [ezy2[0]]]) * 2, ([[0] * 5] + [[2] * 5]) * 2
     ):
         fig.add_trace(
-            go.Scatter3d(x=ezx + [ezx[0]], y=y, z=z, mode="lines", line={"color": "red", "width": 1})
+            go.Scatter3d(
+                x=ezx + [ezx[0]],
+                y=y,
+                z=z,
+                mode="lines",
+                line={"color": "red", "width": 1},
+            )
         )
     # Add vertial end zone box outlines
     for x, y1, y2 in zip(ezx, ezy1, ezy2):
@@ -93,9 +99,7 @@ def main(directory: str) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="Disc Tracker: Plot result with plotly"
-    )
+    parser = argparse.ArgumentParser(prog="Disc Tracker: Plot result with plotly")
     parser.add_argument("directory")
     args = parser.parse_args()
     main(args.directory)
