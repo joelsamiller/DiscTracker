@@ -1,3 +1,6 @@
+import argparse
+import os
+
 import plotly.graph_objects as go
 
 from disc_tracker.deprojection.disc_track import DiscTrack
@@ -67,13 +70,13 @@ def draw_endzones(fig, width = 15.2, length = 30.4, endzone_depth=3) -> None:
     )
 
 
-def main() -> None:
+def main(directory: str) -> None:
     # Create figure plotting the disc path
-    disc_path = DiscTrack("rosie_pull").deproject()
+    disc_path = DiscTrack(directory).deproject()
     fig = go.Figure(
         data=go.Scatter3d(
-            x=-disc_path[0],
-            y=-disc_path[1],
+            x=disc_path[0],
+            y=disc_path[1],
             z=disc_path[2],
             mode="lines",
             line=dict(color="darkblue", width=3),
@@ -85,9 +88,14 @@ def main() -> None:
     # Plot setttings
     fig.update_layout(scene=dict(aspectmode="data"), showlegend=False)
     # Save plot to file
-    fig.write_html("DiscTrack.html")
+    fig.write_html(os.path.join(directory, "disc_track.html"))
     fig.show()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        prog="Disc Tracker: Plot result with plotly"
+    )
+    parser.add_argument("directory")
+    args = parser.parse_args()
+    main(args.directory)

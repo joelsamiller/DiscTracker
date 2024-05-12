@@ -1,3 +1,6 @@
+import argparse
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -121,14 +124,20 @@ def draw_pitch(ax, width = 15.2, length = 30.4, endzone_depth=2) -> None:
         zorder=9,
     )
 
-def main() -> None:
-    disc_path = DiscTrack("rosie_pull").deproject()
+def main(directory: str) -> None:
+    disc_path = DiscTrack(directory).deproject()
     ax = plt.axes(projection="3d")
     draw_pitch(ax)
-    ax.plot3D(-disc_path[0], -disc_path[1], disc_path[2], zorder=10)
+    ax.plot3D(disc_path[0], disc_path[1], disc_path[2], zorder=10)
     ax.set_box_aspect([1, 1, 1])
     set_axes_equal(ax)
+    plt.savefig(os.path.join(directory, "disc_track.png"))
     plt.show()
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        prog="Disc Tracker: Plot result with matplotlib"
+    )
+    parser.add_argument("directory")
+    args = parser.parse_args()
+    main(args.directory)
