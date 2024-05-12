@@ -6,7 +6,15 @@ import plotly.graph_objects as go
 from disc_tracker.deprojection.disc_track import DiscTrack
 
 
-def draw_pitch(fig, width=15.2, length=30.4) -> None:
+def draw_pitch(fig: go.Figure, width=15.2, length=30.4) -> None:
+    """
+    Draw the reference pitch on the figure.
+
+    Args:
+        fig (Figure): Plotly figure to update.
+        width (float, optional): Width of the pitch in meters. Defaults to 15.2.
+        length (float, optional): Length of the pitch in meters. Defaults to 30.4.
+    """    
     # Pitch verts
     px = [-width / 2, width / 2, width / 2, -width / 2]
     py = [length] * 2 + [0] * 2
@@ -14,7 +22,16 @@ def draw_pitch(fig, width=15.2, length=30.4) -> None:
     fig.add_trace(go.Mesh3d(x=px, y=py, z=[0] * 4, color="limegreen", opacity=0.70))
 
 
-def draw_endzones(fig, width=15.2, length=30.4, endzone_depth=3) -> None:
+def draw_endzones(fig: go.Figure, width=15.2, length=30.4, endzone_depth=3) -> None:
+    """
+    Draw the end zones and their associated 2m high box.
+
+    Args:
+        fig (Figure): Plotly figure to update
+        width (float, optional): Width of the pitch in meters. Defaults to 15.2.
+        length (float, optional): Length of the pitch in meters. Defaults to 30.4.
+        endzone_depth (int, optional): Depth of the end zones in meters. Defaults to 3.
+    """    
     # Endzone verts
     ezx = [-width / 2, width / 2, width / 2, -width / 2]
     ezy1 = [length] * 2 + [length - endzone_depth] * 2

@@ -2,16 +2,21 @@ import argparse
 import os
 
 import numpy as np
+import numpy.typing as npt
 import matplotlib.pyplot as plt
 
 from disc_tracker.deprojection.disc_track import DiscTrack
 
 def set_axes_equal(ax: plt.Axes):
-    """Set 3D plot axes to equal scale.
+    """
+    Set 3D plot axes to equal scale.
 
     Make axes of 3D plot have equal scale so that spheres appear as
     spheres and cubes as cubes.  Required since `ax.axis('equal')`
     and `ax.set_aspect('equal')` don't work on 3D.
+
+    Args:
+        ax (Axes): Axes object to set equal.
     """
     limits = np.array(
         [
@@ -24,28 +29,22 @@ def set_axes_equal(ax: plt.Axes):
     radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
     _set_axes_radius(ax, origin, radius)
 
-def _set_axes_radius(ax, origin, radius):
+def _set_axes_radius(ax: plt.Axes, origin: npt.NDArray[np.float64], radius: np.float64):
     x, y, z = origin
     ax.set_xlim3d([x - radius, x + radius])
     ax.set_ylim3d([y - radius, y + radius])
     ax.set_zlim3d([z - radius, z + radius])
 
-def cuboid_data(center, size):
+def cuboid_data(center: tuple[float], size: tuple[float]):
     """
-    Create a data array for cuboid plotting.
+    Create an array for plotting a cuboid
 
+    Args:
+        center (tuple[float]): Coordinates of the cuboid centre (x, y, z).
+        size (tuple[float]): Size of the cuboid (x, y, z).
 
-    ============= ================================================
-    Argument      Description
-    ============= ================================================
-    center        center of the cuboid, triple
-    size          size of the cuboid, triple, (x_length,y_width,z_height)
-    :type size: tuple, numpy.array, list
-    :param size: size of the cuboid, triple, (x_length,y_width,z_height)
-    :type center: tuple, numpy.array, list
-    :param center: center of the cuboid, triple, (x,y,z)
-
-
+    Returns:
+        _type_: _description_
     """
 
     # suppose axis direction: x: to left; y: to inside; z: to upper
@@ -91,7 +90,16 @@ def cuboid_data(center, size):
     ]  # z coordinate of points in inside surface
     return x, y, z
 
-def draw_pitch(ax, width = 15.2, length = 30.4, endzone_depth=2) -> None:
+def draw_pitch(ax: plt.Axes, width = 15.2, length = 30.4, endzone_depth=3) -> None:
+    """
+    Draw the reference pitch on the axes.
+
+    Args:
+        ax (Axes): Axes to update
+        width (float, optional): Width of the pitch in meters. Defaults to 15.2.
+        length (float, optional): Length of the pitch in meters. Defaults to 30.4.
+        endzone_depth (int, optional): Depth of the end zones in meters. Defaults to 3.
+    """    
     # Pitch verts
     px = [-width / 2, width / 2, width / 2, -width / 2]
     py = [length] * 2 + [0] * 2

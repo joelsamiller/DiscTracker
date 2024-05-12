@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.typing as npt
 
 from collections import OrderedDict
 from scipy.spatial import distance
@@ -6,37 +7,78 @@ from scipy import optimize
 
 
 class Object:
-    def __init__(self, creation_time: int, position: np.ndarray[float]) -> None:
+    def __init__(self, creation_time: np.int64, position: npt.NDArray[np.int64]) -> None:
+        """
+        Initialise class.
+
+        Args:
+            creation_time (int64): Time object id first used (frame number).
+            position (NDArray[int64]): Coordinates of object.
+        """        
         self.position = np.append(position, creation_time)
 
         self.track = self.position[None, :]
         self.velocity = np.array([0, 0])
 
-    def update_position(self, time: int, position: np.ndarray[float]) -> None:
+    def update_position(self, time: np.int64, position: npt.NDArray[np.int64]) -> None:
+        """
+        Update the position and track of the object with new coordinates.
+
+        Args:
+            time (int64): Time the update occures (frame number).
+            position (npt.NDArray[np.int64]): Coordinates of the object.
+        """        
         self.position = np.append(position, time)
         self.track = np.vstack([self.track, self.position])
 
 
 class Tracker:
     def __init__(self, max_disappeared=5000):
+        """
+        Initialise class.
+
+        Args:
+            max_disappeared (int, optional): Delete object after this many frames with no detection. Defaults to 5000.
+        """        
         self.next_id = 0
         self.current_time = 0
         self.objects = OrderedDict()
         self.disappeared = OrderedDict()
         self.max_disappeared = max_disappeared
 
-    def register(self, position: np.ndarray[float]):
+    def register(self, position: npt.NDArray[np.int64]):
+        """
+        Register a new object.
+
+        Args:
+            position (NDArray[int64]): Coordinates of the object.
+        """        
         self.objects[self.next_id] = Object(
             creation_time=self.current_time, position=position
         )
         self.disappeared[self.next_id] = 0
         self.next_id += 1
 
-    def deregister(self, id):
+    def deregister(self, id: np.int64):
+        """
+        Remove an object.
+
+        Args:
+            id (int64): ID of object to remove.
+        """        
         del self.objects[id]
         del self.disappeared[id]
 
-    def update(self, new_position: np.ndarray[float]) -> OrderedDict:
+    def update(self, new_position: npt.NDArray[np.int64]) -> OrderedDict[np.int64, Object]:
+        """
+        Update the positions of existing objects and register any new objects.
+
+        Args:
+            new_position (NDArray[int64]): Coordinates of all objects detected in the frame.
+
+        Returns:
+            OrderedDict[int64, Object]: Dictionary of all tracked objects.
+        """        
         if new_position.size == 0:
             for id in self.disappeared:
                 self.disappeared[id] += 1

@@ -1,14 +1,24 @@
 import os
+from collections.abc import Sequence
 from typing import OrderedDict
 
 import cv2 as cv
 import numpy as np
 
 from disc_tracker.video_processing import Tracker
+from disc_tracker.video_processing.tracker import Object
 
 
-def cleanMask(mask: np.ndarray) -> np.ndarray:
+def cleanMask(mask: cv.typing.MatLike) -> cv.typing.MatLike:
+    """
+    Perform opening and closing on the forground mask to remove noise and join fragmented objects.
 
+    Args:
+        mask (MatLike): The forground mask to be cleaned.
+
+    Returns:
+        MatLike: Cleaned foreground mask.
+    """
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
     mask = cv.morphologyEx(mask, cv.MORPH_OPEN, kernel)
 
@@ -19,7 +29,12 @@ def cleanMask(mask: np.ndarray) -> np.ndarray:
 
 
 def setup_blob_detector() -> cv.SimpleBlobDetector:
+    """
+    Set the parameters for the blob detector.
 
+    Returns:
+        SimpleBlobDetector
+    """
     # Blob detector parameters
     params = cv.SimpleBlobDetector_Params()
     params.filterByInertia = False
@@ -33,7 +48,16 @@ def setup_blob_detector() -> cv.SimpleBlobDetector:
 
 
 def load_video(directory: str, chanel: str) -> cv.VideoCapture:
+    """
+    Load the specified video chanel from the given directory.
 
+    Args:
+        directory (str): Path to the directory containing the `video` sub-directory.
+        chanel (str): Video chanel to load. Either `left` or `right`.
+
+    Returns:
+        VideoCapture
+    """
     filepath = os.path.join(directory, "video", f"{chanel}.mp4")
     video = cv.VideoCapture(filepath)
     # Check video is open
@@ -47,8 +71,18 @@ def detect_objects(
     background_subtractor: cv.BackgroundSubtractorMOG2,
     blob_detector: cv.SimpleBlobDetector,
     frame: cv.typing.MatLike,
-):
+) -> Sequence[cv.KeyPoint]:
+    """
+    Detect objects a given video frame.
 
+    Args:
+        background_subtractor (cv.BackgroundSubtractorMOG2): Gaussian mixture model for background/foreground.
+        blob_detector (cv.SimpleBlobDetector): Blob detector.
+        frame (cv.typing.MatLike): Frame to find objects in.
+
+    Returns:
+        Sequence[KeyPoint]: Coordinates of all objects detected in the frame
+    """
     foreground_mask = background_subtractor.apply(frame)  # Create FG mask for frame
     # Clean the mask to optimise object detection
     foreground_mask = cleanMask(foreground_mask)
@@ -56,8 +90,14 @@ def detect_objects(
     return blob_detector.detect(foreground_mask)  # Blob detection
 
 
-def add_object_ids_to_frame(frame: cv.typing.MatLike, tracks: dict) -> None:
+def add_object_ids_to_frame(frame: cv.typing.MatLike, tracks: OrderedDict[np.int64, Object]) -> None:
+    """
+    Label objects on each frame by adding text containing the object id at the position of each object.
 
+    Args:
+        frame (MatLike): Input frame.
+        tracks (OrderedDict[int64, Object]): Dictionary of all objects in this frame.
+    """
     for id, track in tracks.items():
         cv.putText(
             img=frame,
@@ -70,8 +110,17 @@ def add_object_ids_to_frame(frame: cv.typing.MatLike, tracks: dict) -> None:
         )
 
 
-def add_object_bbox_to_frame(frame: cv.typing.MatLike, blobs) -> cv.typing.MatLike:
+def add_object_bbox_to_frame(frame: cv.typing.MatLike, blobs: Sequence[cv.KeyPoint]) -> cv.typing.MatLike:
+    """
+    Draw circles representing the location and size of all the objects detected in a frame.
 
+    Args:
+        frame (MatLike): Input frame.
+        blobs (Sequence[KeyPoint]): Coordinates of all objects in input frame.
+
+    Returns:
+        MatLike: Output frame.
+    """
     # Plot blob locations and show IDs over the video frame
     return cv.drawKeypoints(
         image=frame,
@@ -82,8 +131,17 @@ def add_object_bbox_to_frame(frame: cv.typing.MatLike, blobs) -> cv.typing.MatLi
     )
 
 
-def track_objects(video: cv.VideoCapture, chanel: str) -> OrderedDict:
+def track_objects(video: cv.VideoCapture, chanel: str) -> OrderedDict[np.int64, Object]:
+    """
+    Detect and track objects in the loaded video.
 
+    Args:
+        video (VideoCapture): Input video.
+        chanel (str): Name of video chanel.
+
+    Returns:
+        OrderedDict[int64, Object]: Dictionary containing all of the objects tracked in the video.
+    """
     background_subtractor = (
         cv.createBackgroundSubtractorMOG2()
     )  # Initialise BG subtractor
@@ -116,8 +174,15 @@ def track_objects(video: cv.VideoCapture, chanel: str) -> OrderedDict:
     return tracks
 
 
-def save_disc_track(filename, tracks: dict, id: int) -> None:
-    # Save the track for the disc to file
+def save_disc_track(filename: str, tracks: OrderedDict[np.int64, Object], id: np.int64) -> None:
+    """
+    Write the track corresponding to the disc to file.
+
+    Args:
+        filename (str): Name to save the file as.
+        tracks (OrderedDict[int64, Object]): Dictonary of objects tracked in the video.
+        id (int64): ID of the object which is the disc.
+    """    # Save the track for the disc to file
     np.savez(
         filename,
         x=tracks[id].track[:, 0],
