@@ -90,7 +90,9 @@ def detect_objects(
     return blob_detector.detect(foreground_mask)  # Blob detection
 
 
-def add_object_ids_to_frame(frame: cv.typing.MatLike, tracks: OrderedDict[np.int64, Object]) -> None:
+def add_object_ids_to_frame(
+    frame: cv.typing.MatLike, tracks: OrderedDict[np.int64, Object]
+) -> None:
     """
     Label objects on each frame by adding text containing the object id at the position of each object.
 
@@ -110,7 +112,9 @@ def add_object_ids_to_frame(frame: cv.typing.MatLike, tracks: OrderedDict[np.int
         )
 
 
-def add_object_bbox_to_frame(frame: cv.typing.MatLike, blobs: Sequence[cv.KeyPoint]) -> cv.typing.MatLike:
+def add_object_bbox_to_frame(
+    frame: cv.typing.MatLike, blobs: Sequence[cv.KeyPoint]
+) -> cv.typing.MatLike:
     """
     Draw circles representing the location and size of all the objects detected in a frame.
 
@@ -174,7 +178,9 @@ def track_objects(video: cv.VideoCapture, chanel: str) -> OrderedDict[np.int64, 
     return tracks
 
 
-def save_disc_track(filename: str, tracks: OrderedDict[np.int64, Object], id: np.int64) -> None:
+def save_disc_track(
+    filename: str, tracks: OrderedDict[np.int64, Object], id: np.int64
+) -> None:
     """
     Write the track corresponding to the disc to file.
 
@@ -182,7 +188,7 @@ def save_disc_track(filename: str, tracks: OrderedDict[np.int64, Object], id: np
         filename (str): Name to save the file as.
         tracks (OrderedDict[int64, Object]): Dictonary of objects tracked in the video.
         id (int64): ID of the object which is the disc.
-    """    # Save the track for the disc to file
+    """
     np.savez(
         filename,
         x=tracks[id].track[:, 0],

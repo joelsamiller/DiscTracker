@@ -9,14 +9,15 @@ from numpy.lib.npyio import NpzFile
 class DiscTrack:
     """
     Class for storing the disc track coordinates and deprojecting them to 3D coordinates.
-    """    
+    """
+
     def __init__(self, directory: str) -> None:
         """
         Initialise class.
 
         Args:
             directory (str): Path to directory containing `tracks` sub-directory.
-        """        
+        """
         self.directory = directory
         self.read_camera_settings()
         self.read_tracks()
@@ -27,7 +28,7 @@ class DiscTrack:
 
         Returns:
             tuple[NDArray[float64]]: X, Y and Z coordinates of the disc in 3D space.
-        """        
+        """
         x = 0.5 * self.camera_settings["d"] * (self.xl + self.xr) / (self.xl - self.xr)
         z = (
             -0.5 * self.camera_settings["d"] * (self.zl + self.zr) / (self.xl - self.xr)
@@ -42,7 +43,7 @@ class DiscTrack:
     def read_tracks(self) -> None:
         """
         Load the tracks data from file.
-        """        
+        """
         tracks_directory = os.path.join(self.directory, "tracks")
         L = np.load(os.path.join(tracks_directory, "left.npz"))
         R = np.load(os.path.join(tracks_directory, "right.npz"))
@@ -62,7 +63,7 @@ class DiscTrack:
     def read_camera_settings(self) -> None:
         """
         Read in the camera settings from file.
-        """        
+        """
         with open(os.path.join(self.directory, "camera_settings.yaml")) as file:
             self.camera_settings = yaml.safe_load(file)
         self.camera_settings["f"] = (
@@ -72,7 +73,9 @@ class DiscTrack:
         )
 
     @staticmethod
-    def complete_tracks(data: NpzFile, time_index: npt.NDArray[np.int64]) -> dict[str, npt.NDArray[np.int64]]:
+    def complete_tracks(
+        data: NpzFile, time_index: npt.NDArray[np.int64]
+    ) -> dict[str, npt.NDArray[np.int64]]:
         """
         Interpolate coordinates for missing frames and trim to coeval time period.
 
@@ -82,7 +85,7 @@ class DiscTrack:
 
         Returns:
             dict[str, NDArray[int64]]: Cleaned coordinate tracks for each axis.
-        """        
+        """
         return {
             axis: np.interp(time_index, data["t"], data[axis]).astype(np.int64)
             for axis in "xy"
@@ -101,11 +104,11 @@ class DiscTrack:
 
         Returns:
             NDArray[int64]: Coveal time values.
-        
+
         Examples:
         >>> DiscTrack.get_time_index(np.array[2, 3, 4, 6, 7], np.array[1, 2, 3, 5, 8])
         array([2, 3, 4, 5, 6, 7])
-        """        
+        """
         t_min = max(min(left), min(right))
         t_max = min(max(left), max(right))
         return np.arange(t_min, t_max + 1)

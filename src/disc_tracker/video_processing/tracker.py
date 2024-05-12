@@ -7,14 +7,16 @@ from scipy import optimize
 
 
 class Object:
-    def __init__(self, creation_time: np.int64, position: npt.NDArray[np.int64]) -> None:
+    def __init__(
+        self, creation_time: np.int64, position: npt.NDArray[np.int64]
+    ) -> None:
         """
         Initialise class.
 
         Args:
             creation_time (int64): Time object id first used (frame number).
             position (NDArray[int64]): Coordinates of object.
-        """        
+        """
         self.position = np.append(position, creation_time)
 
         self.track = self.position[None, :]
@@ -27,7 +29,7 @@ class Object:
         Args:
             time (int64): Time the update occures (frame number).
             position (npt.NDArray[np.int64]): Coordinates of the object.
-        """        
+        """
         self.position = np.append(position, time)
         self.track = np.vstack([self.track, self.position])
 
@@ -39,7 +41,7 @@ class Tracker:
 
         Args:
             max_disappeared (int, optional): Delete object after this many frames with no detection. Defaults to 5000.
-        """        
+        """
         self.next_id = 0
         self.current_time = 0
         self.objects = OrderedDict()
@@ -52,7 +54,7 @@ class Tracker:
 
         Args:
             position (NDArray[int64]): Coordinates of the object.
-        """        
+        """
         self.objects[self.next_id] = Object(
             creation_time=self.current_time, position=position
         )
@@ -65,11 +67,13 @@ class Tracker:
 
         Args:
             id (int64): ID of object to remove.
-        """        
+        """
         del self.objects[id]
         del self.disappeared[id]
 
-    def update(self, new_position: npt.NDArray[np.int64]) -> OrderedDict[np.int64, Object]:
+    def update(
+        self, new_position: npt.NDArray[np.int64]
+    ) -> OrderedDict[np.int64, Object]:
         """
         Update the positions of existing objects and register any new objects.
 
@@ -78,7 +82,7 @@ class Tracker:
 
         Returns:
             OrderedDict[int64, Object]: Dictionary of all tracked objects.
-        """        
+        """
         if new_position.size == 0:
             for id in self.disappeared:
                 self.disappeared[id] += 1

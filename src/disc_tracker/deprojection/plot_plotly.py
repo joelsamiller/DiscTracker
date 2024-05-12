@@ -14,7 +14,7 @@ def draw_pitch(fig: go.Figure, width=15.2, length=30.4) -> None:
         fig (Figure): Plotly figure to update.
         width (float, optional): Width of the pitch in meters. Defaults to 15.2.
         length (float, optional): Length of the pitch in meters. Defaults to 30.4.
-    """    
+    """
     # Pitch verts
     px = [-width / 2, width / 2, width / 2, -width / 2]
     py = [length] * 2 + [0] * 2
@@ -31,7 +31,7 @@ def draw_endzones(fig: go.Figure, width=15.2, length=30.4, endzone_depth=3) -> N
         width (float, optional): Width of the pitch in meters. Defaults to 15.2.
         length (float, optional): Length of the pitch in meters. Defaults to 30.4.
         endzone_depth (int, optional): Depth of the end zones in meters. Defaults to 3.
-    """    
+    """
     # Endzone verts
     ezx = [-width / 2, width / 2, width / 2, -width / 2]
     ezy1 = [length] * 2 + [length - endzone_depth] * 2

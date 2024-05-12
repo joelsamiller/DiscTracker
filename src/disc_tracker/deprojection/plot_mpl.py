@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 from disc_tracker.deprojection.disc_track import DiscTrack
 
+
 def set_axes_equal(ax: plt.Axes):
     """
     Set 3D plot axes to equal scale.
@@ -29,11 +30,13 @@ def set_axes_equal(ax: plt.Axes):
     radius = 0.5 * np.max(np.abs(limits[:, 1] - limits[:, 0]))
     _set_axes_radius(ax, origin, radius)
 
+
 def _set_axes_radius(ax: plt.Axes, origin: npt.NDArray[np.float64], radius: np.float64):
     x, y, z = origin
     ax.set_xlim3d([x - radius, x + radius])
     ax.set_ylim3d([y - radius, y + radius])
     ax.set_zlim3d([z - radius, z + radius])
+
 
 def cuboid_data(center: tuple[float], size: tuple[float]):
     """
@@ -90,7 +93,8 @@ def cuboid_data(center: tuple[float], size: tuple[float]):
     ]  # z coordinate of points in inside surface
     return x, y, z
 
-def draw_pitch(ax: plt.Axes, width = 15.2, length = 30.4, endzone_depth=3) -> None:
+
+def draw_pitch(ax: plt.Axes, width=15.2, length=30.4, endzone_depth=3) -> None:
     """
     Draw the reference pitch on the axes.
 
@@ -99,7 +103,7 @@ def draw_pitch(ax: plt.Axes, width = 15.2, length = 30.4, endzone_depth=3) -> No
         width (float, optional): Width of the pitch in meters. Defaults to 15.2.
         length (float, optional): Length of the pitch in meters. Defaults to 30.4.
         endzone_depth (int, optional): Depth of the end zones in meters. Defaults to 3.
-    """    
+    """
     # Pitch verts
     px = [-width / 2, width / 2, width / 2, -width / 2]
     py = [length] * 2 + [0] * 2
@@ -132,6 +136,7 @@ def draw_pitch(ax: plt.Axes, width = 15.2, length = 30.4, endzone_depth=3) -> No
         zorder=9,
     )
 
+
 def main(directory: str) -> None:
     disc_path = DiscTrack(directory).deproject()
     ax = plt.axes(projection="3d")
@@ -142,10 +147,9 @@ def main(directory: str) -> None:
     plt.savefig(os.path.join(directory, "disc_track.png"))
     plt.show()
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        prog="Disc Tracker: Plot result with matplotlib"
-    )
+    parser = argparse.ArgumentParser(prog="Disc Tracker: Plot result with matplotlib")
     parser.add_argument("directory")
     args = parser.parse_args()
     main(args.directory)
