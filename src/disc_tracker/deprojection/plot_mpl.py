@@ -136,7 +136,7 @@ def main(directory: str) -> None:
     disc_path = DiscTrack(directory).deproject()
     ax = plt.axes(projection="3d")
     draw_pitch(ax)
-    ax.plot3D(disc_path[0], disc_path[1], disc_path[2], zorder=10)
+    ax.plot3D(*disc_path, zorder=10)
     ax.set_box_aspect([1, 1, 1])
     set_axes_equal(ax)
     plt.savefig(os.path.join(directory, "disc_track.png"))

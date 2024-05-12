@@ -95,12 +95,12 @@ def draw_endzones(fig: go.Figure, width=15.2, length=30.4, endzone_depth=3) -> N
 
 def main(directory: str) -> None:
     # Create figure plotting the disc path
-    disc_path = DiscTrack(directory).deproject()
+    x, y, z = DiscTrack(directory).deproject()
     fig = go.Figure(
         data=go.Scatter3d(
-            x=disc_path[0],
-            y=disc_path[1],
-            z=disc_path[2],
+            x=x,
+            y=y,
+            z=z,
             mode="lines",
             line=dict(color="darkblue", width=3),
             name="Disc Path",
