@@ -23,3 +23,5 @@ dependencies = [
   "matplotlib",
   "mayavi",
 ]
+[project.scripts]
+disc_tracker = "disc_tracker:main"
