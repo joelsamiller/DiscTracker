@@ -14,6 +14,7 @@ def main() -> None:
     parser.add_argument(
         "-p", "--plot-method", default="plotly", choices=["plotly", "mpl", "mlab"]
     )
+    parser.add_argument("-plot_only", action="store_true")
 
     args = parser.parse_args()
 
@@ -21,17 +22,20 @@ def main() -> None:
     print("Disc Tracker".center(64))
     print("*" * 64)
     print(f"Directory: {args.directory}")
+    print(f"Plotting method: {args.plot_method}")
+    print(f"Plot only: {args.plot_only}")
 
-    for chanel in ["left", "right"]:
-        video = gg6.load_video(args.directory, chanel)
-        print(f"    Tracking objects for {chanel} chanel...")
-        tracks = gg6.track_objects(video, chanel)
-        disc_id = int(input(f"    Enter id of disc in {chanel} chanel: "))
-        gg6.save_disc_track(
-            os.path.join(args.directory, "tracks", f"{chanel}.npz"), tracks, disc_id
-        )
+    if not args.plot_only:
+        for chanel in ["left", "right"]:
+            video = gg6.load_video(args.directory, chanel)
+            print(f"\nTracking objects for {chanel} chanel...")
+            tracks = gg6.track_objects(video, chanel)
+            disc_id = int(input(f"Enter id of disc in {chanel} chanel: "))
+            gg6.save_disc_track(
+                os.path.join(args.directory, "tracks", f"{chanel}.npz"), tracks, disc_id
+            )
 
-    print("    Plotting results...")
+    print("\nPlotting results...")
     eval(f"plot_{args.plot_method}.main(args.directory)")
     print("Done!")
     
