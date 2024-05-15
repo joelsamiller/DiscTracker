@@ -26,16 +26,18 @@ def main() -> None:
     print(f"Plot only: {args.plot_only}")
 
     if not args.plot_only:
+        tracks_directory = os.path.join(args.directory, "tracks")
+        # Create tracks directory if one doesn't exist
+        os.makedirs(tracks_directory, exist_ok=True)
         for chanel in ["left", "right"]:
             video = gg6.load_video(args.directory, chanel)
             print(f"\nTracking objects for {chanel} chanel...")
             tracks = gg6.track_objects(video, chanel)
             disc_id = int(input(f"Enter id of disc in {chanel} chanel: "))
             gg6.save_disc_track(
-                os.path.join(args.directory, "tracks", f"{chanel}.npz"), tracks, disc_id
+                os.path.join(tracks_directory, f"{chanel}.npz"), tracks, disc_id
             )
 
     print("\nPlotting results...")
     eval(f"plot_{args.plot_method}.main(args.directory)")
     print("Done!")
-    
