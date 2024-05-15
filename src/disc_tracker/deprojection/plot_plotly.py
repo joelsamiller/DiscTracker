@@ -2,11 +2,13 @@ import argparse
 import os
 
 import plotly.graph_objects as go
+import yaml
 
+from disc_tracker.deprojection import settings
 from disc_tracker.deprojection.disc_track import DiscTrack
 
 
-def draw_pitch(fig: go.Figure, width=15.2, length=30.4) -> None:
+def draw_pitch(fig: go.Figure, width=15.2, length=30.4, endzone_depth=3) -> None:
     """
     Draw the reference pitch on the figure.
 
@@ -20,6 +22,7 @@ def draw_pitch(fig: go.Figure, width=15.2, length=30.4) -> None:
     py = [length] * 2 + [0] * 2
     # Add pitch mesh
     fig.add_trace(go.Mesh3d(x=px, y=py, z=[0] * 4, color="limegreen", opacity=0.70))
+    draw_endzones(fig, width, length, endzone_depth)
 
 
 def draw_endzones(fig: go.Figure, width=15.2, length=30.4, endzone_depth=3) -> None:
@@ -106,8 +109,14 @@ def main(directory: str) -> None:
             name="Disc Path",
         )
     )
-    draw_pitch(fig)
-    draw_endzones(fig)
+    pitch_dimensions_path = os.path.join(directory, "pitch_dimensions.yaml")
+    if os.path.exists(pitch_dimensions_path):
+        with open(pitch_dimensions_path) as file:
+            pitch_dimensions = yaml.safe_load(file)
+    else:
+        print("No pitch dimensions file found. Defaulting to UKU measurements.")
+        pitch_dimensions = settings.UKU_PITCH_DIMENSIONS
+    draw_pitch(fig, **pitch_dimensions)
     # Plot setttings
     fig.update_layout(scene=dict(aspectmode="data"), showlegend=False)
     # Save plot to file

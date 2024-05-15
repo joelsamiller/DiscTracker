@@ -4,7 +4,9 @@ import os
 import numpy as np
 import numpy.typing as npt
 import matplotlib.pyplot as plt
+import yaml
 
+from disc_tracker.deprojection import settings
 from disc_tracker.deprojection.disc_track import DiscTrack
 
 
@@ -140,7 +142,14 @@ def draw_pitch(ax: plt.Axes, width=15.2, length=30.4, endzone_depth=3) -> None:
 def main(directory: str) -> None:
     disc_path = DiscTrack(directory).deproject()
     ax = plt.axes(projection="3d")
-    draw_pitch(ax)
+    pitch_dimensions_path = os.path.join(directory, "pitch_dimensions.yaml")
+    if os.path.exists(pitch_dimensions_path):
+        with open(pitch_dimensions_path) as file:
+            pitch_dimensions = yaml.safe_load(file)
+    else:
+        print("No pitch dimensions file found. Defaulting to UKU measurements.")
+        pitch_dimensions = settings.UKU_PITCH_DIMENSIONS
+    draw_pitch(ax, **pitch_dimensions)
     ax.plot3D(*disc_path, zorder=10)
     ax.set_box_aspect([1, 1, 1])
     set_axes_equal(ax)
