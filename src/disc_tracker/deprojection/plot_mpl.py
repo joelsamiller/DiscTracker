@@ -115,7 +115,7 @@ def draw_pitch(ax: plt.Axes, width=15.2, length=30.4, endzone_depth=3) -> None:
     # Endzone verts
     ezx = [-width / 2, width / 2, width / 2, -width / 2] * 2
     ezz = [0] * 4 + [endzone_depth] * 4
-    ezx, ezy, ezz = cuboid_data((0, 1.5, 1), (15.2, 3, 2))
+    ezx, ezy, ezz = cuboid_data((0, endzone_depth / 2, 1), (width, endzone_depth, 2))
     ax.plot_wireframe(
         np.array(ezx),
         np.array(ezy),
@@ -126,7 +126,7 @@ def draw_pitch(ax: plt.Axes, width=15.2, length=30.4, endzone_depth=3) -> None:
         edgecolor="r",
         zorder=9,
     )
-    ezx, ezy, ezz = cuboid_data((0, 28.9, 1), (15.2, 3, 2))
+    ezx, ezy, ezz = cuboid_data((0, length - endzone_depth / 2, 1), (width, endzone_depth, 2))
     ax.plot_wireframe(
         np.array(ezx),
         np.array(ezy),
