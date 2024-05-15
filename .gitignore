@@ -1,4 +1,6 @@
 # file types
 *.html
+*.png
+*.jpg
 *.ipynb
 *.pyc

@@ -1,6 +1,6 @@
-resolution : [1280, 720]  # px
+resolution: [1280, 720]  # px
 sensor_width: 0.0047  # m
 focal_length: 0.004  # m
-d : 4  # Horizontal separation of the cameras in meters
-c : 1.8  # Distance between cameras and back of endzone in meters
-h : 2.8  # Height of cameras above ground in meters
+d: 4  # Horizontal separation of the cameras in meters
+c: 1.8  # Distance between cameras and back of endzone in meters
+h: 2.8  # Height of cameras above ground in meters
