@@ -2,7 +2,13 @@ import argparse
 import os
 
 from disc_tracker.video_processing import gg6
-from disc_tracker.deprojection import plot_mlab, plot_mpl, plot_plotly
+from disc_tracker.deprojection.plot import PlotlyPlot, MatplotlibPlot, MlabPlot
+
+PLOT_CLASS = {
+    "plotly": PlotlyPlot,
+    "mpl": MatplotlibPlot,
+    "mlab": MlabPlot,
+}
 
 
 def main() -> None:
@@ -39,5 +45,7 @@ def main() -> None:
             )
 
     print("\nPlotting results...")
-    eval(f"plot_{args.plot_method}.main(args.directory)")
+    track_plot = PLOT_CLASS[args.plot_method](args.directory)
+    track_plot.save_figure()
+    track_plot.show_figure()
     print("Done!")
