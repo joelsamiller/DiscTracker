@@ -45,6 +45,7 @@ This package can be installed using:
 ```bash
 pip install git+https://github.com/JoelM935/DiscTracker@main
 ```
+The example footage folder in the `data` directory can also be downloaded from GitHub.
 
 ## Running the program
 Once installed, a command line executable `disc_tracker` will be available on your machine.
@@ -53,6 +54,7 @@ Before running the program, the input data must be packaged up in the following 
 ```
 └── 📁name                      <- Name for the dataset
     └── camera_settings.yaml    <- Yaml file containing camera settings
+    └── pitch_dimensions.yaml   <- Yaml file containing pitch dimensions (optional)
     └── 📁tracks                <- Output directory for track data
     └── 📁video
         └── left.mp4            <- Synced video from the left camera
@@ -61,12 +63,20 @@ Before running the program, the input data must be packaged up in the following 
 The `camera_settings` yaml, must be formatted as follows:
 ```yaml
 resolution: [x, y]  # Video resolution in pixels
-sensor_width: <Width of the camera sensor in meters>
-focal_length: <Focal length of the lens in meters>
-d: <Horizontal separation of the cameras in meters>
-c: <Distance between cameras and back of endzone in meters>
-h: <Height of cameras above ground in meters>
+sensor_width: <width of the camera sensor in meters>
+focal_length: <focal length of the lens in meters>
+d: <horizontal separation of the cameras in meters>
+c: <distance between cameras and back of endzone in meters>
+h: <height of cameras above ground in meters>
 ```
+The optional `pitch_dimensions` yaml, must be formatted as follows:
+```yaml
+width: <width of pitch in meters>
+length: <length of pitch in meters>
+endzone_depth: <depth of end zones in meters>
+```
+if no `pitch_dimensions` yaml is present, the default UKU measurements will be used (40m x 20m with 5m endzones).
+
 Once this is set up, the program can be run using:
 ```bash
 disc_tracker /path/to/dataset/
