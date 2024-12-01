@@ -83,7 +83,7 @@ class Tracker:
             OrderedDict[int64, Object]: Dictionary of all tracked objects.
         """
         if new_position.size == 0:
-            for id in self.disappeared:
+            for id in self.disappeared.copy():
                 self.disappeared[id] += 1
 
                 if self.disappeared[id] > self.max_disappeared:
