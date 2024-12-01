@@ -106,7 +106,7 @@ class DiscTrack:
             NDArray[int64]: Coveal time values.
 
         Examples:
-        >>> DiscTrack.get_time_index(np.array[2, 3, 4, 6, 7], np.array[1, 2, 3, 5, 8])
+        >>> DiscTrack.get_time_index(np.array([2, 3, 4, 6, 7]), np.array([1, 2, 3, 5, 8]))
         array([2, 3, 4, 5, 6, 7])
         """
         t_min = max(min(left), min(right))
