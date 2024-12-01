@@ -2,12 +2,11 @@ import argparse
 import os
 
 from disc_tracker.video_processing import gg6
-from disc_tracker.deprojection.plot import PlotlyPlot, MatplotlibPlot, MlabPlot
+from disc_tracker.deprojection.plot import PlotlyPlot, MatplotlibPlot
 
 PLOT_CLASS = {
     "plotly": PlotlyPlot,
     "mpl": MatplotlibPlot,
-    "mlab": MlabPlot,
 }
 
 

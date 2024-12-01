@@ -1,6 +1,5 @@
 import os
 
-from mayavi import mlab
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
@@ -270,11 +269,3 @@ class MatplotlibPlot(Plot):
 
     def show_figure(self):
         plt.show()
-
-
-class MlabPlot(Plot):
-    def plot_disc_path(self):
-        mlab.plot3d(*self.disc_path)
-
-    def show_figure(self):
-        mlab.show()
