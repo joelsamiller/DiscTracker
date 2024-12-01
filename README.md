@@ -1,11 +1,11 @@
 # DiscTracker
 
 ## Background
- 
+
 In indoor ultimate frisbee, each point begins with one team throwing the disc to the other team on opposing sides of the field, called a "pull".
-For this pull to be deemed "valid", it must pass through any part of an imaginary two-meter-high box bounded by the front, back and sidelines of the receiving team's endzone. 
+For this pull to be deemed "valid", it must pass through any part of an imaginary two-meter-high box bounded by the front, back and sidelines of the receiving team's endzone.
 The dimensions of the pitch in the demo footage provided are shown in Figure 2.
-By tracking the position of the disc in 3-dimensional space it is possible to determine if its path intersects this box, and thus whether the pull was valid. 
+By tracking the position of the disc in 3-dimensional space it is possible to determine if its path intersects this box, and thus whether the pull was valid.
 Figure 1 shows a representation of the pitch used, in 3-dimensional space, with the two-meter-high bounding boxes plotted.
 
 ![FrisbeePitch](https://github.com/JoelM935/DiscTracker/assets/33060876/cc745ae0-dd6c-4a7f-9cb0-d1b17ad47212)\
@@ -14,7 +14,7 @@ Figure 1 shows a representation of the pitch used, in 3-dimensional space, with 
 ## Method
 ### Camera Setup
 ![Camera_Setup](https://github.com/JoelM935/DiscTracker/assets/33060876/03c96ae6-fb88-4036-beb6-71389b3777eb)\
-*Fig. 2 Setup used to capture footage* 
+*Fig. 2 Setup used to capture footage*
 
 This program takes two input videos which must be from two parallel-facing cameras (separated by some distance $d$) and timesynced. A diagram of the setup for the demo footage is shown in Figure 2. Any new footage must follow the same setup (though exact pitch dimensions can change).
 
@@ -86,4 +86,3 @@ This will plot the result using Plotly by default. To plot using Matplotlib use:
 disc_tracker /path/to/dataset/ -p mpl
 ```
 If track data already exists in the `tracks` sub-directory, they can be plotted using the `-plot_only` option.
- 
