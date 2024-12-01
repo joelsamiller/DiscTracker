@@ -20,7 +20,6 @@ class Object:
         self.position = np.append(position, creation_time)
 
         self.track = self.position[None, :]
-        self.velocity = np.array([0, 0])
 
     def update_position(self, time: np.int64, position: npt.NDArray[np.int64]) -> None:
         """

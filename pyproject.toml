@@ -25,3 +25,6 @@ dependencies = [
 ]
 [project.scripts]
 disc_tracker = "disc_tracker:main"
+
+[project.optional-dependencies]
+dev = ["pre-commit"]
